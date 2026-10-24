@@ -206,6 +206,9 @@ git clone --depth 1 --branch "$FFMPEG_TAG" \
             --extra-cflags="-I$PREFIX/include" --extra-ldflags="-L$PREFIX/lib" \
             --enable-libx264 --enable-librubberband --enable-zlib \
             --enable-libmp3lame --enable-libopus --enable-libvorbis \
+            --disable-d3d11va \
+            --disable-d3d12va \
+            --disable-dxva2 \
             --target-os=mingw32 --arch=x86_64 \
             --cross-prefix=x86_64-w64-mingw32- \
             --pkg-config=pkg-config
