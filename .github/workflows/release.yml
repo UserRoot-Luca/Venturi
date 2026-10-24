@@ -119,7 +119,7 @@ jobs:
           targets: x86_64-pc-windows-gnu
 
       - name: Install MinGW-w64 toolchain and dependencies
-        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 libz-mingw-w64-dev nasm pkg-config meson ninja-build
+        run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 libz-mingw-w64-dev nasm pkg-config meson ninja-build libclang-dev
 
       - name: Set target
         run: echo "CARGO_BUILD_TARGET=x86_64-pc-windows-gnu" >> "$GITHUB_ENV"
@@ -136,6 +136,12 @@ jobs:
         with:
           path: target/ffmpeg-shared
           key: ffmpeg-windows-${{ runner.arch }}-${{ hashFiles('scripts/build-ffmpeg.sh') }}
+
+      - name: Sanity check FFmpeg cross build
+        run: |
+          ls -l target/ffmpeg-shared/lib/pkgconfig
+          PKG_CONFIG_PATH="$PWD/target/ffmpeg-shared/lib/pkgconfig" \
+            pkg-config --modversion libavcodec libavutil libavformat libavfilter libavdevice libswscale libswresample
 
       - name: Build
         run: bash scripts/build-windows.sh
