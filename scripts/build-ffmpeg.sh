@@ -32,7 +32,7 @@ case "$OS" in
         ;;
     Windows*|MINGW*|MSYS*|CYGWIN*)
         # Windows MinGW-w64 build
-        WANT="$FFMPEG_TAG mingw $X264_BRANCH $RUBBERBAND_TAG $AUDIO_CODECS"
+        WANT="$FFMPEG_TAG mingw-no-d3dva $X264_BRANCH $RUBBERBAND_TAG $AUDIO_CODECS"
         JOBS="${NCPU:-$(nproc 2>/dev/null || echo 4)}"
         HW_FLAGS=()  # No hardware encoders for Windows cross-compile
         ;;
