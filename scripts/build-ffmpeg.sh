@@ -32,7 +32,7 @@ case "$OS" in
         ;;
     Windows*|MINGW*|MSYS*|CYGWIN*)
         # Windows MinGW-w64 build
-        WANT="$FFMPEG_TAG mingw-no-d3dva $X264_BRANCH $RUBBERBAND_TAG $AUDIO_CODECS"
+        WANT="$FFMPEG_TAG mingw $X264_BRANCH $RUBBERBAND_TAG $AUDIO_CODECS"
         JOBS="${NCPU:-$(nproc 2>/dev/null || echo 4)}"
         HW_FLAGS=()  # No hardware encoders for Windows cross-compile
         ;;
@@ -206,9 +206,6 @@ git clone --depth 1 --branch "$FFMPEG_TAG" \
             --extra-cflags="-I$PREFIX/include" --extra-ldflags="-L$PREFIX/lib" \
             --enable-libx264 --enable-librubberband --enable-zlib \
             --enable-libmp3lame --enable-libopus --enable-libvorbis \
-            --disable-d3d11va \
-            --disable-d3d12va \
-            --disable-dxva2 \
             --target-os=mingw32 --arch=x86_64 \
             --cross-prefix=x86_64-w64-mingw32- \
             --pkg-config=pkg-config
