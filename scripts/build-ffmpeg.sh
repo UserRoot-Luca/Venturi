@@ -93,8 +93,7 @@ git clone --depth 1 --branch "$X264_BRANCH" \
     cd "$SRC/x264"
     case "$OS" in
         Windows*|MINGW*|MSYS*|CYGWIN*)
-            # For MinGW-w64, specify host
-            HOST_OPT="--host=x86_64-w64-mingw32"
+            HOST_OPT="--host=x86_64-w64-mingw32 --cross-prefix=x86_64-w64-mingw32-"
             ;;
         *)
             HOST_OPT=""
