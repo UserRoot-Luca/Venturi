@@ -121,6 +121,10 @@ jobs:
       - name: Install MinGW-w64 toolchain and dependencies
         run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 libz-mingw-w64-dev nasm pkg-config meson ninja-build libclang-dev
 
+      - name: Add d3d12video.h (missing from Ubuntu 24.04's mingw-w64 11.0.1)
+        run: sudo curl -fsSL -o /usr/x86_64-w64-mingw32/include/d3d12video.h \
+            https://raw.githubusercontent.com/mingw-w64/mingw-w64/v13.0.0/mingw-w64-headers/include/d3d12video.h
+
       - name: Set target
         run: echo "CARGO_BUILD_TARGET=x86_64-pc-windows-gnu" >> "$GITHUB_ENV"
 
@@ -136,6 +140,7 @@ jobs:
         with:
           path: target/ffmpeg-shared
           key: ffmpeg-windows-${{ runner.arch }}-${{ hashFiles('scripts/build-ffmpeg.sh') }}
+
 
       - name: Build
         run: bash scripts/build-windows.sh
