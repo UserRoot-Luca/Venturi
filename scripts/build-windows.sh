@@ -43,6 +43,10 @@ FFMPEG_OS=MINGW scripts/build-ffmpeg.sh "$FFMPEG_PREFIX"
 export PKG_CONFIG_ALLOW_CROSS=1
 export PKG_CONFIG_PATH="$FFMPEG_PREFIX/lib/pkgconfig"
 
+# Let bindgen/libclang find the MinGW-w64 Windows SDK headers,
+# including Direct3D 11/12 and DXGI headers.
+export BINDGEN_EXTRA_CLANG_ARGS="--target=x86_64-w64-mingw32 -isystem /usr/x86_64-w64-mingw32/include"
+
 # Build the application for Windows
 cargo clean --release -p ffmpeg-sys-next -p vv-media -p vv-app 2>/dev/null || true
 cargo build -p vv-app --release --target "$TARGET"
