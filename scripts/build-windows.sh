@@ -42,6 +42,7 @@ FFMPEG_OS=MINGW scripts/build-ffmpeg.sh "$FFMPEG_PREFIX"
 
 export PKG_CONFIG_ALLOW_CROSS=1
 export PKG_CONFIG_PATH="$FFMPEG_PREFIX/lib/pkgconfig"
+export PKG_CONFIG_LIBDIR="$FFMPEG_PREFIX/lib/pkgconfig:/usr/x86_64-w64-mingw32/lib/pkgconfig"
 
 # Let bindgen/libclang find the MinGW-w64 Windows SDK headers,
 # including Direct3D 11/12 and DXGI headers.
