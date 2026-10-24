@@ -2,7 +2,8 @@
 # Builds FFmpeg from source (shared libraries) with libx264, librubberband,
 # zlib, the encoders of the voiceover takes (libmp3lame, libopus, libvorbis)
 # and the platform hardware encoder and decoders (NVENC, NVDEC and Vulkan
-# video on Linux, VideoToolbox on macOS) into a local prefix. Used by build-appimage.sh, build-macos.sh and build-windows.sh.
+# video on Linux, VideoToolbox on macOS) into a local prefix. Used by build-appimage.sh,
+# build-macos.sh and build-windows.sh.
 #
 # Usage: scripts/build-ffmpeg.sh <prefix>
 set -euo pipefail
@@ -22,7 +23,7 @@ VORBIS_VERSION="1.3.7"
 OPUS_VERSION="1.5.2"
 AUDIO_CODECS="lame-$LAME_VERSION ogg-$OGG_VERSION vorbis-$VORBIS_VERSION opus-$OPUS_VERSION"
 
-OS="$(uname -s)"
+OS="${FFMPEG_OS:-$(uname -s)}"
 case "$OS" in
     Darwin)
         WANT="$FFMPEG_TAG videotoolbox $X264_BRANCH $RUBBERBAND_TAG $AUDIO_CODECS ${MACOSX_DEPLOYMENT_TARGET:-}"
@@ -110,6 +111,20 @@ git clone --depth 1 --branch "$RUBBERBAND_TAG" \
     https://github.com/breakfastquay/rubberband.git "$SRC/rubberband"
 (
     cd "$SRC/rubberband"
+    cat > "$SRC/mingw-cross.txt" <<'EOF'
+[binaries]
+c = 'x86_64-w64-mingw32-gcc'
+cpp = 'x86_64-w64-mingw32-g++'
+ar = 'x86_64-w64-mingw32-ar'
+strip = 'x86_64-w64-mingw32-strip'
+windres = 'x86_64-w64-mingw32-windres'
+
+[host_machine]
+system = 'windows'
+cpu_family = 'x86_64'
+cpu = 'x86_64'
+endian = 'little'
+EOF
     if [ "$OS" = Darwin ]; then
         # v4.0.0 uses size_t without <cstddef>; recent libc++ no longer
         # pulls it in transitively.
@@ -121,11 +136,7 @@ git clone --depth 1 --branch "$RUBBERBAND_TAG" \
             -Ddefault_library=shared -Dresampler=builtin \
             -Djni=disabled -Dladspa=disabled -Dvamp=disabled \
             -Dcmdline=disabled -Dtests=disabled \
-            --cross-file="$SRC/mingw-cross.txt" 2>/dev/null || \
-            CXX=x86_64-w64-mingw32-g++ meson setup build --prefix="$PREFIX" --libdir=lib --buildtype=release \
-            -Ddefault_library=shared -Dresampler=builtin \
-            -Djni=disabled -Dladspa=disabled -Dvamp=disabled \
-            -Dcmdline=disabled -Dtests=disabled
+            --cross-file="$SRC/mingw-cross.txt"
     else
         meson setup build --prefix="$PREFIX" --libdir=lib --buildtype=release \
             -Ddefault_library=shared -Dresampler=builtin \
@@ -196,7 +207,8 @@ git clone --depth 1 --branch "$FFMPEG_TAG" \
             --extra-cflags="-I$PREFIX/include" --extra-ldflags="-L$PREFIX/lib" \
             --enable-libx264 --enable-librubberband --enable-zlib \
             --enable-libmp3lame --enable-libopus --enable-libvorbis \
-            --target-os=mingw32 --arch=x86_64
+            --target-os=mingw32 --arch=x86_64 \
+            --cross-prefix=x86_64-w64-mingw32-
     else
         ./configure --prefix="$PREFIX" --enable-shared --disable-static \
             --enable-gpl --disable-autodetect --disable-programs --disable-doc \
