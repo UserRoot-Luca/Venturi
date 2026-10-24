@@ -40,9 +40,6 @@ VERSION="$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)"
 # Build FFmpeg for Windows
 FFMPEG_OS=MINGW scripts/build-ffmpeg.sh "$FFMPEG_PREFIX"
 
-rm -f "$FFMPEG_PREFIX/include/libavutil/hwcontext_d3d11va.h" \
-      "$FFMPEG_PREFIX/include/libavutil/hwcontext_d3d12va.h"
-
 export PKG_CONFIG_ALLOW_CROSS=1
 export PKG_CONFIG_PATH="$FFMPEG_PREFIX/lib/pkgconfig"
 
