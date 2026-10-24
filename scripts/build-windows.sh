@@ -38,7 +38,7 @@ ZIP_FILE="$OUT_DIR/Venturi-$ARCH.zip"
 VERSION="$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)"
 
 # Build FFmpeg for Windows
-scripts/build-ffmpeg.sh "$FFMPEG_PREFIX"
+FFMPEG_OS=MINGW scripts/build-ffmpeg.sh "$FFMPEG_PREFIX"
 
 # Build the application for Windows
 cargo clean --release -p ffmpeg-sys-next -p vv-media -p vv-app 2>/dev/null || true
@@ -64,19 +64,30 @@ done
 
 # Also copy codec libraries
 CODEC_DLLS=(
-    libx264 libmp3lame libopus libvorbis libogg
+    libx264 libmp3lame libopus libvorbis libogg rubberband
 )
 
 for dll in "${CODEC_DLLS[@]}"; do
-    find "$FFMPEG_BIN" -maxdepth 1 -name "${dll}-*.dll" -exec cp {} "$BUNDLE_DIR/" \;
+    find "$FFMPEG_BIN" -maxdepth 1 \( -name "${dll}-*.dll" -o -name "${dll}.dll" \) \
+        -exec cp {} "$BUNDLE_DIR/" \;
+done
+
+# MinGW runtime DLLs (winpthreads; libgcc/libstdc++ needed by rubberband)
+for rt in libwinpthread-1 libgcc_s_seh-1 libstdc++-6; do
+    if [ -f "/usr/x86_64-w64-mingw32/lib/$rt.dll" ]; then
+        cp "/usr/x86_64-w64-mingw32/lib/$rt.dll" "$BUNDLE_DIR/"
+    else
+        find /usr/lib/gcc/x86_64-w64-mingw32/ -name "$rt.dll" -exec cp {} "$BUNDLE_DIR/" \;
+    fi
 done
 
 # Verify all required DLLs are present in the bundle
 MISSING_DLLS=0
-ALL_DLLS=("${REQUIRED_DLLS[@]}" "${CODEC_DLLS[@]}")
+ALL_DLLS=("${REQUIRED_DLLS[@]}" "${CODEC_DLLS[@]}" libwinpthread-1 libgcc_s_seh-1 libstdc++-6)
 for dll in "${ALL_DLLS[@]}"; do
-    if ! ls "$BUNDLE_DIR"/${dll}-*.dll >/dev/null 2>&1; then
-        echo "Missing required DLL: ${dll}-*.dll" >&2
+    if ! ls "$BUNDLE_DIR"/${dll}-*.dll >/dev/null 2>&1 \
+        && ! ls "$BUNDLE_DIR"/${dll}.dll >/dev/null 2>&1; then
+        echo "Missing required DLL: $dll" >&2
         MISSING_DLLS=1
     fi
 done
