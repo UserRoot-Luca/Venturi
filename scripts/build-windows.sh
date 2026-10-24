@@ -44,6 +44,10 @@ export PKG_CONFIG_ALLOW_CROSS=1
 export PKG_CONFIG_PATH="$FFMPEG_PREFIX/lib/pkgconfig"
 export PKG_CONFIG_LIBDIR="$FFMPEG_PREFIX/lib/pkgconfig:/usr/x86_64-w64-mingw32/lib/pkgconfig"
 
+echo "--- .pc files in prefix ---"
+ls -l "$FFMPEG_PREFIX/lib/pkgconfig"
+pkg-config --modversion libavcodec libavutil libavformat libavfilter libavdevice libswscale libswresample
+
 # Let bindgen/libclang find the MinGW-w64 Windows SDK headers,
 # including Direct3D 11/12 and DXGI headers.
 export BINDGEN_EXTRA_CLANG_ARGS="--target=x86_64-w64-mingw32 -isystem /usr/x86_64-w64-mingw32/include"
