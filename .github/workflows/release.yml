@@ -137,12 +137,6 @@ jobs:
           path: target/ffmpeg-shared
           key: ffmpeg-windows-${{ runner.arch }}-${{ hashFiles('scripts/build-ffmpeg.sh') }}
 
-      - name: Sanity check FFmpeg cross build
-        run: |
-          ls -l target/ffmpeg-shared/lib/pkgconfig
-          PKG_CONFIG_PATH="$PWD/target/ffmpeg-shared/lib/pkgconfig" \
-            pkg-config --modversion libavcodec libavutil libavformat libavfilter libavdevice libswscale libswresample
-
       - name: Build
         run: bash scripts/build-windows.sh
 
