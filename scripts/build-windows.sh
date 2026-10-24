@@ -40,6 +40,9 @@ VERSION="$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)"
 # Build FFmpeg for Windows
 FFMPEG_OS=MINGW scripts/build-ffmpeg.sh "$FFMPEG_PREFIX"
 
+export PKG_CONFIG_ALLOW_CROSS=1
+export PKG_CONFIG_PATH="$FFMPEG_PREFIX/lib/pkgconfig"
+
 # Build the application for Windows
 cargo clean --release -p ffmpeg-sys-next -p vv-media -p vv-app 2>/dev/null || true
 cargo build -p vv-app --release --target "$TARGET"
